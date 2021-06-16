@@ -1,6 +1,13 @@
 import { CdkDragDrop, CdkDragMove, CdkDragStart, copyArrayItem, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnInit } from '@angular/core';
 import { DragSourceRenderer } from '../shared/ag-grid-renderers/drag-source.renderer';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DialogComponent } from './components/dialog/dialog.component';
+
+export interface DialogData {
+  animal: string;
+  name: string;
+}
 
 @Component({
   selector: 'app-flow-engine',
@@ -49,7 +56,10 @@ export class FlowEngineComponent implements OnInit {
   private defaultColDef;
   private frameworkComponents;
 
-  constructor() {
+  animal: string;
+  name: string;
+
+  constructor(public dialog: MatDialog) {
     this.defaultColDef = {
       width: 80,
       sortable: true,
@@ -101,5 +111,18 @@ export class FlowEngineComponent implements OnInit {
 
   openConfiguration(item) {
     console.log('called', item);
+  }
+
+  
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogComponent, {
+      width: '250px',
+      data: {name: this.name, animal: this.animal}
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.animal = result;
+    });
   }
 }
