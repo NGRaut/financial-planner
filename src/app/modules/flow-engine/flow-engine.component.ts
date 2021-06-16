@@ -26,7 +26,7 @@ export class FlowEngineComponent implements OnInit {
   ];
 
   columnDefs = [
-    { cellRenderer: 'dragSourceCellRenderer', dndSource: true, width: '300px' },
+    { cellRenderer: 'dragSourceCellRenderer', dndSource: true, width: '300px', field: 'make' },
   ];
 
   rowData = [
@@ -84,10 +84,22 @@ export class FlowEngineComponent implements OnInit {
   onDrop(event) {
     var userAgent = window.navigator.userAgent;
     var isIE = userAgent.indexOf('Trident/') >= 0;
-    var jsonData = event.dataTransfer.getData(
-      isIE ? 'text' : 'application/json'
-    );
+    var jsonData = event.dataTransfer.getData(isIE ? 'text' : 'application/json');
     event.preventDefault();
-    this.basket.push(jsonData);
+    var resolvedData = jsonData;
+    if (jsonData.constructor === "".constructor) {
+      resolvedData = JSON.parse(jsonData);
+    }
+
+    if (resolvedData.constructor === ({}).constructor) {
+      this.basket.push(resolvedData);
+    }
+    else {
+      console.error('Invalid data supplied to Drag');
+    }
+  }
+
+  openConfiguration(item) {
+    console.log('called', item);
   }
 }

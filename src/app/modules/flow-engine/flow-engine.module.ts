@@ -6,9 +6,10 @@ import { AgGridModule } from 'ag-grid-angular';
 import { FlowEngineRoutingModule } from './flow-engine-routing.module';
 import { FlowEngineComponent } from './flow-engine.component';
 import { DragSourceRenderer } from '../shared/ag-grid-renderers/drag-source.renderer';
+import { DoubleClickDirective } from '../shared/directives/double-click.directive';
 
 @NgModule({
-  declarations: [FlowEngineComponent, DragSourceRenderer],
+  declarations: [FlowEngineComponent, DragSourceRenderer, DoubleClickDirective],
   imports: [
     CommonModule,
     FlowEngineRoutingModule,

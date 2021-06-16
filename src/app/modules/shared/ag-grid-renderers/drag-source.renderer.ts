@@ -18,9 +18,6 @@ export class DragSourceRenderer {
   onDragStart(dragEvent: DragEvent) {
     var userAgent = window.navigator.userAgent;
     var isIE = userAgent.indexOf('Trident/') >= 0;
-    dragEvent.dataTransfer.setData(
-      isIE ? 'text' : 'text/plain',
-      'Dragged item with ID: ' + this.params.node.data.id
-    );
+    dragEvent.dataTransfer.setData(isIE ? 'text' : 'application/json', JSON.stringify(this.params.node.data));
   }
 }

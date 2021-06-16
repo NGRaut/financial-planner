@@ -21,22 +21,30 @@
 </div>
 
 <br />
-<div style="width:100%">
-    <div style="width:50%; float:left">
-        <ag-grid-angular #agGrid style="width: 310px; height: 500px;" id="myGrid" class="ag-theme-alpine"
-            [defaultColDef]="defaultColDef" [rowData]="rowData" [rowDragManaged]="true" [columnDefs]="columnDefs"
-            [frameworkComponents]="frameworkComponents" [animateRows]="true" (gridReady)="onGridReady($event)">
-        </ag-grid-angular>
-    </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-3">
+            <ag-grid-angular #agGrid style="width: 310px; height: 500px;" id="myGrid" class="ag-theme-alpine"
+                [defaultColDef]="defaultColDef" [rowData]="rowData" [rowDragManaged]="true" [columnDefs]="columnDefs"
+                [frameworkComponents]="frameworkComponents" [animateRows]="true" (gridReady)="onGridReady($event)">
+            </ag-grid-angular>
+        </div>
 
-    <div style="width:50%;float:right">
-        <div class="drop-col" (dragover)="onDragOver($event)" (drop)="onDrop($event)"
-            style="height:500px;width:500px;border:1px solid black">
-            <span id="eDropTarget" class="drop-target">
-                ==&gt; Drop here
-            </span>
-            <div cdkDropList [cdkDropListData]="basket" class="example-list" (cdkDropListDropped)="drop($event)">
-                <div class="example-box" *ngFor="let item of basket" cdkDrag>{{item}}</div>
+        <div class="col-9">
+            <!--I initially wanted to use angular material for both drag and drop.
+            But while dragging an item from source to destination as a copy, the item disappears temporarily and re-apperars
+            thus it looks glitched so I instead went for ag-grid as source to copy from.
+            But while using angular material as drop zone, it wasn't supported out of the box,
+            so from ag-grid's examples that uses a custom drop zone, I used the container for drop zone from ag-grid,
+            and inside that, I am using materia's drag-drop list that will only display the items only after items are added.-->
+            <div class="drop-col" (dragover)="onDragOver($event)" (drop)="onDrop($event)"
+                style="height:500px;border:1px solid black">
+                <span id="eDropTarget" class="drop-target">
+                    ==&gt; Drop here
+                </span>
+                <div cdkDropList [cdkDropListData]="basket" class="example-list">
+                    <div class="example-box" *ngFor="let item of basket" cdkDrag (appDoubleClick)="openConfiguration(item)">{{item.make}}</div>
+                </div>
             </div>
         </div>
     </div>
