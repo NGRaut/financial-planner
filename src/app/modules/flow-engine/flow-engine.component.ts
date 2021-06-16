@@ -111,13 +111,15 @@ export class FlowEngineComponent implements OnInit {
 
   openConfiguration(item) {
     console.log('called', item);
+    this.openDialog(item);
   }
 
   
-  openDialog(): void {
+  openDialog(item): void {
     const dialogRef = this.dialog.open(DialogComponent, {
       width: '250px',
-      data: {name: this.name, animal: this.animal}
+      data: {name: this.name, animal: this.animal},
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe(result => {
