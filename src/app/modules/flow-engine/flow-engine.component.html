@@ -1,7 +1,7 @@
 <p>flow-engine works!</p>
 
 <br />
-<div cdkDropListGroup>
+<div hidden cdkDropListGroup>
     <div class="example-container">
         <h2>Available items</h2>
 
@@ -19,4 +19,8 @@
         </div>
     </div>
 </div>
+
 <br />
+<ag-grid-angular style="width: 310px; height: 500px;" class="ag-theme-alpine" [rowData]="rowData"
+    [columnDefs]="columnDefs">
+</ag-grid-angular>

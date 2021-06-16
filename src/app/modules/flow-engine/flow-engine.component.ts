@@ -8,7 +8,8 @@ import { MatList } from '@angular/material';
   styleUrls: ['./flow-engine.component.scss']
 })
 export class FlowEngineComponent implements OnInit {
-  todo = [
+
+  items = [
     'Mutual Fund (MF)',
     'Public Provident Fund (PPF)',
     'Employee Provident Fund (EPF)',
@@ -21,22 +22,24 @@ export class FlowEngineComponent implements OnInit {
     'Sukanya smriddhi yojana (SSY)'
   ];
 
-  done = [
-    'test'
-  ];
-
-  items = [
-    'Carrots',
-    'Tomatoes',
-    'Onions',
-    'Apples',
-    'Avocados'
-  ];
-
   basket = [
-    'Oranges',
-    'Bananas',
-    'Cucumbers'
+  ];
+
+  columnDefs = [
+    { field: 'make', width: '300px' }
+  ];
+
+  rowData = [
+    { make: 'Mutual Fund (MF)', },
+    { make: 'Public Provident Fund (PPF)', },
+    { make: 'Employee Provident Fund (EPF)', },
+    { make: 'Fixed Deposits', },
+    { make: 'National Pension Scheme', },
+    { make: 'Tax Saver Fixed Deposits', },
+    { make: 'LIC premium', },
+    { make: 'National Savings Certificate (NSC)', },
+    { make: 'Senior citizen savings scheme (SCSS)', },
+    { make: 'Sukanya smriddhi yojana (SSY)' },
   ];
 
   @ViewChild(MatList, { read: ElementRef, static: false }) child: ElementRef;
@@ -48,23 +51,8 @@ export class FlowEngineComponent implements OnInit {
   ngOnInit() {
   }
 
-  dragStart(event: CdkDragStart) {
-    this._currentIndex = this.items.indexOf(event.source.data); // Get index of dragged type
-    this._currentField = this.child.nativeElement.children[this._currentIndex]; // Store HTML field
-  }
-
-  moved(event: CdkDragMove) {
-    // Check if stored HTML field is as same as current field
-    if (this.child.nativeElement.children[this._currentIndex] !== this._currentField) {
-      // Replace current field, basically replaces placeholder with old HTML content
-      this.child.nativeElement.replaceChild(this._currentField, this.child.nativeElement.children[this._currentIndex]);
-    }
-  }
-
   drop(event: CdkDragDrop<string[]>) {
-    if (event.previousContainer === event.container) {
-      // moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
+    if (event.previousContainer !== event.container) {
       copyArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
   }

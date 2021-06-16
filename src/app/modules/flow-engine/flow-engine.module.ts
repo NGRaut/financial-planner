@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { AgGridModule } from 'ag-grid-angular';
 
 import { FlowEngineRoutingModule } from './flow-engine-routing.module';
 import { FlowEngineComponent } from './flow-engine.component';
@@ -11,7 +12,8 @@ import { FlowEngineComponent } from './flow-engine.component';
   imports: [
     CommonModule,
     FlowEngineRoutingModule,
-    DragDropModule
+    DragDropModule,
+    AgGridModule.withComponents([])
   ]
 })
 export class FlowEngineModule { }
