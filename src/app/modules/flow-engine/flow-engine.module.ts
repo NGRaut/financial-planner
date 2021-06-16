@@ -5,15 +5,15 @@ import { AgGridModule } from 'ag-grid-angular';
 
 import { FlowEngineRoutingModule } from './flow-engine-routing.module';
 import { FlowEngineComponent } from './flow-engine.component';
-
+import { DragSourceRenderer } from '../shared/ag-grid-renderers/drag-source.renderer';
 
 @NgModule({
-  declarations: [FlowEngineComponent],
+  declarations: [FlowEngineComponent, DragSourceRenderer],
   imports: [
     CommonModule,
     FlowEngineRoutingModule,
     DragDropModule,
-    AgGridModule.withComponents([])
+    AgGridModule.withComponents([DragSourceRenderer])
   ]
 })
 export class FlowEngineModule { }

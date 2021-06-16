@@ -1,6 +1,6 @@
 import { CdkDragDrop, CdkDragMove, CdkDragStart, copyArrayItem, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { MatList } from '@angular/material';
+import { Component, ElementRef, OnInit } from '@angular/core';
+import { DragSourceRenderer } from '../shared/ag-grid-renderers/drag-source.renderer';
 
 @Component({
   selector: 'app-flow-engine',
@@ -26,7 +26,7 @@ export class FlowEngineComponent implements OnInit {
   ];
 
   columnDefs = [
-    { field: 'make', width: '300px' }
+    { cellRenderer: 'dragSourceCellRenderer', dndSource: true, width: '300px' },
   ];
 
   rowData = [
@@ -42,11 +42,22 @@ export class FlowEngineComponent implements OnInit {
     { make: 'Sukanya smriddhi yojana (SSY)' },
   ];
 
-  @ViewChild(MatList, { read: ElementRef, static: false }) child: ElementRef;
-  _currentIndex;
-  _currentField;
+  private gridApi;
+  private gridColumnApi;
 
-  constructor() { }
+  private rowClassRules;
+  private defaultColDef;
+  private frameworkComponents;
+
+  constructor() {
+    this.defaultColDef = {
+      width: 80,
+      sortable: true,
+      filter: true,
+      resizable: true,
+    };
+    this.frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer };
+  }
 
   ngOnInit() {
   }
@@ -55,5 +66,28 @@ export class FlowEngineComponent implements OnInit {
     if (event.previousContainer !== event.container) {
       copyArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
+  }
+
+  onGridReady(params) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+  }
+
+  onDragOver(event) {
+    var dragSupported = event.dataTransfer.length;
+    if (dragSupported) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+    event.preventDefault();
+  }
+
+  onDrop(event) {
+    var userAgent = window.navigator.userAgent;
+    var isIE = userAgent.indexOf('Trident/') >= 0;
+    var jsonData = event.dataTransfer.getData(
+      isIE ? 'text' : 'application/json'
+    );
+    event.preventDefault();
+    this.basket.push(jsonData);
   }
 }
