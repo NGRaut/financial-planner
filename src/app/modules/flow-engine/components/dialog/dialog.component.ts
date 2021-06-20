@@ -9,6 +9,10 @@ import { DialogData } from '../../flow-engine.component';
 })
 export class DialogComponent implements OnInit {
 
+  componentsList: string[] = [
+    'app-mutual-fund'
+  ]
+
   constructor(
     public dialogRef: MatDialogRef<DialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData) { }

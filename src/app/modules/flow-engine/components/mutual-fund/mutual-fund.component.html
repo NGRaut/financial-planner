@@ -1,0 +1,85 @@
+<mat-card class="shipping-card">
+  <!-- <mat-card-header>
+    <mat-card-title>Shipping Information</mat-card-title>
+  </mat-card-header> -->
+  <mat-card-content>
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col">
+            <mat-label>Monthly Investment &#8377;</mat-label>
+            <mat-select [(ngModel)]="selectedCurrency">
+              <input class="currency" matInput (keyup)="onKey($event.target.value)" placeholder="Type here to search">
+              <mat-option *ngFor="let currency of selectedCurrencies" [value]="currency.code">{{currency.code}}
+              </mat-option>
+            </mat-select>
+          </div>
+          <div class="col">
+            <input matInput [(ngModel)]="selectedInstallment" (keypress)="keyPress($event)">
+          </div>
+        </div>
+        <mat-slider class="full-width" [max]="frequency.max" [min]="frequency.min" thumbLabel
+          [displayWith]="formatLabel" [step]="frequency.step" [(ngModel)]="selectedInstallment"
+          aria-labelledby="example-name-label">
+        </mat-slider>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col">
+            <mat-label>Expected Rate of Interest</mat-label>
+          </div>
+          <div class="col">
+            <input matInput type="number" [(ngModel)]="selectedReturnRate" (keypress)="keyPress($event)">
+          </div>
+        </div>
+        <mat-slider class="full-width" [max]="expectedReturnRate.max" [min]="expectedReturnRate.min" thumbLabel
+          [displayWith]="formatLabel" [step]="expectedReturnRate.step" [(ngModel)]="selectedReturnRate"
+          aria-labelledby="example-name-label">
+        </mat-slider>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="row">
+          <div class="col">
+            <mat-label>Time Period</mat-label>
+          </div>
+          <div class="col">
+            <input matInput type="number" [(ngModel)]="selectedYear" (keypress)="keyPress($event)">
+          </div>
+        </div>
+        <mat-slider class="full-width" [max]="timePeriod.max" [min]="timePeriod.min" thumbLabel
+          [displayWith]="formatLabel" [step]="timePeriod.step" [(ngModel)]="selectedYear"
+          aria-labelledby="example-name-label">
+        </mat-slider>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-5">
+        <mat-label>Invested Amount</mat-label>
+        <br />
+        <mat-label>{{totalInvestment | currency: 'INR'}}</mat-label>
+      </div>
+      <div class="col-3">
+        <mat-label>Estimated Return</mat-label>
+        <br />
+        <mat-label>{{estimatedReturn | currency: 'INR'}}</mat-label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-5"></div>
+      <div class="col">
+        <mat-label>Total Value {{dataChanged()}}</mat-label>
+        <br />
+        <mat-label>{{totalValue | currency: 'INR'}}</mat-label>
+      </div>
+      <div class="col"></div>
+    </div>
+  </mat-card-content>
+  <!-- <mat-card-actions>
+    <button mat-raised-button color="primary" type="submit">Submit</button>
+  </mat-card-actions> -->
+</mat-card>

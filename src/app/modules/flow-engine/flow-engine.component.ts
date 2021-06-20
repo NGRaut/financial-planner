@@ -117,7 +117,7 @@ export class FlowEngineComponent implements OnInit {
   
   openDialog(item): void {
     const dialogRef = this.dialog.open(DialogComponent, {
-      width: '250px',
+      width: '600px',
       data: {name: this.name, animal: this.animal},
       disableClose: true
     });
