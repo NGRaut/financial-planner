@@ -9,7 +9,6 @@ import { AgGridModule } from 'ag-grid-angular';
 import { FlowEngineRoutingModule } from './flow-engine-routing.module';
 import { FlowEngineComponent } from './flow-engine.component';
 import { DragSourceRenderer } from '../shared/ag-grid-renderers/drag-source.renderer';
-import { DoubleClickDirective } from '../shared/directives/double-click.directive';
 import { DialogComponent } from './components/dialog/dialog.component';
 import { MutualFundComponent } from './components/mutual-fund/mutual-fund.component';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,7 +18,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSliderModule } from '@angular/material';
 
 @NgModule({
-  declarations: [FlowEngineComponent, DragSourceRenderer, DoubleClickDirective, DialogComponent,
+  declarations: [FlowEngineComponent, DragSourceRenderer, DialogComponent,
     MutualFundComponent],
   imports: [
     CommonModule,

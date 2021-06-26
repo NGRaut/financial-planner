@@ -1,65 +1,47 @@
-<br />
-<div hidden cdkDropListGroup>
-    <div class="example-container">
-        <h2>Available items</h2>
-
-        <div cdkDropList [cdkDropListData]="items" class="example-list" cdkDropListSortingDisabled
-            (cdkDropListDropped)="drop($event)" (cdkDragStarted)="dragStart($event)">
-            <div class="example-box" *ngFor="let item of items" cdkDrag>{{item}}</div>
-        </div>
-    </div>
-
-    <div class="example-container">
-        <h2>Shopping basket</h2>
-
-        <div cdkDropList [cdkDropListData]="basket" class="example-list" (cdkDropListDropped)="drop($event)">
-            <div class="example-box" *ngFor="let item of basket" cdkDrag>{{item}}</div>
-        </div>
-    </div>
-</div>
-
-<br />
 <div class="container-fluid">
     <div class="row">
-        <div class="col-3">
-            <ag-grid-angular #agGrid style="width: 310px; height: 500px;" id="myGrid" class="ag-theme-alpine"
-                [defaultColDef]="defaultColDef" [rowData]="rowData" [rowDragManaged]="true" [columnDefs]="columnDefs"
-                [frameworkComponents]="frameworkComponents" [animateRows]="true" (gridReady)="onGridReady($event)">
+        <div class="col-4">
+            <ag-grid-angular #agGrid style="width: 100%; height: 500px;" id="leftGrid" class="ag-theme-alpine"
+                [defaultColDef]="defaultColDef" [rowData]="financialComponents" [rowDragManaged]="true"
+                [columnDefs]="leftColumnDefs" [frameworkComponents]="frameworkComponents" [animateRows]="true"
+                (gridReady)="onLeftGridReady($event)">
             </ag-grid-angular>
         </div>
-
-        <div class="col-9">
+        <div class="col-4">
             <!--I initially wanted to use angular material for both drag and drop.
             But while dragging an item from source to destination as a copy, the item disappears temporarily and re-apperars
             thus it looks glitched so I instead went for ag-grid as source to copy from.
             But while using angular material as drop zone, it wasn't supported out of the box,
             so from ag-grid's examples that uses a custom drop zone, I used the container for drop zone from ag-grid,
             and inside that, I am using materia's drag-drop list that will only display the items only after items are added.-->
-            <div class="drop-col" (dragover)="onDragOver($event)" (drop)="onDrop($event)"
+            <div class="user-grid drop-col" (dragover)="onDragOver($event)" (drop)="onDrop($event)"
                 style="height:500px;border:1px solid black">
                 <span id="eDropTarget" class="drop-target">
                     ==&gt; Drop here
                 </span>
                 <div cdkDropList [cdkDropListData]="basket" class="example-list">
-                    <div class="example-box" *ngFor="let item of basket" cdkDrag
-                        (appDoubleClick)="openConfiguration(item)">{{item.make}}</div>
+                    <div class="example-box row" *ngFor="let item of basket" cdkDrag>
+                        <div class="col">{{item.name}}</div>
+                        <ng-container *ngIf="item.configuration">
+                            <div class="col">{{item.configuration.installment}}</div>
+                            <div class="col">{{item.configuration.year}}</div>
+                            <div class="col">{{item.configuration.totalInvestment}}</div>
+                            <div class="col">{{item.configuration.returnRate}}</div>
+                            <div class="col">{{item.configuration.estimatedReturn}}</div>
+                            <div class="col">{{item.configuration.totalValue}}</div>
+                            <div class="col">{{item.configuration.liquidity}}</div>
+                        </ng-container>
+                        <div class="col" (click)="openConfiguration(item)">Configure</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<br />
-<ol>
-    <li>
-        <mat-form-field>
-            <mat-label>What's your name?</mat-label>
-            <input matInput [(ngModel)]="name">
-        </mat-form-field>
-    </li>
-    <li>
-        <button mat-raised-button (click)="openDialog()">Pick one</button>
-    </li>
-    <li *ngIf="animal">
-        You chose: <i>{{animal}}</i>
-    </li>
-</ol>
+
+<div style="height: 100%;" class="inner-col" (dragover)="gridDragOver($event)" (drop)="gridDrop($event,'left')">
+    <ag-grid-angular #agGrid style="width: 100%; height: 500px;" id="rightGrid" class="ag-theme-alpine"
+        [defaultColDef]="defaultColDef" [columnDefs]="rightColumnDefs" [frameworkComponents]="frameworkComponents"
+        (gridReady)="onRightGridReady($event)" [gridOptions]="rightGridOptions">
+    </ag-grid-angular>
+</div>

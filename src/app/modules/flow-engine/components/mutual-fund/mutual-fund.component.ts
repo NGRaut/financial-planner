@@ -1,5 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { MatSliderChange } from '@angular/material';
+import { FinancialConfiguration } from '../../flow-engine.component';
+import { DialogConfig } from '../dialog/dialog.component';
 
 interface Currency {
   code: string;
@@ -10,7 +13,7 @@ interface Currency {
   templateUrl: './mutual-fund.component.html',
   styleUrls: ['./mutual-fund.component.scss']
 })
-export class MutualFundComponent {
+export class MutualFundComponent implements OnInit {
   addressForm = this.fb.group({
     company: null,
     firstName: [null, Validators.required],
@@ -52,19 +55,29 @@ export class MutualFundComponent {
     step: 1
   }
 
-  selectedYear = 10;
+  selectedConfiguration = {
+    year: 10,
+    returnRate: 12,
+    installment: 500,
+    totalInvestment: 0,
+    totalValue: 0,
+    estimatedReturn: 0
+  };
+
   selectedCurrency: string;
   selectedCurrencies: Currency[];
-  selectedReturnRate = 12;
-  selectedInstallment = 500;
-  totalInvestment: number = 0;
-  totalValue: number = 0;
-  estimatedReturn: number = 0;
   sipFormula: '5000 * (Math.pow((1 + 0.01), 120) - 1) / 0.01 * 1.01';
+
+  @Input('config') dialogConfig: DialogConfig;
 
   constructor(private fb: FormBuilder) {
     this.selectedCurrency = this.currencies.find(a => a.code === 'INR').code;
     this.selectedCurrencies = this.currencies;
+  }
+
+  ngOnInit(): void {
+    if (this.dialogConfig.dialogData.configuration)
+      this.selectedConfiguration = JSON.parse(JSON.stringify(this.dialogConfig.dialogData.configuration));
     this.dataChanged();
   }
 
@@ -87,20 +100,35 @@ export class MutualFundComponent {
   }
 
   keyPress(event) {
-    if (event.which < 48 || event.which > 57)
-    {
+    if (event.which < 48 || event.which > 57) {
       event.preventDefault();
     }
   }
 
   calculateSip(monthlyAmount, rateOfInterest, totalMonths) {
-    return monthlyAmount * (Math.pow((1 + (rateOfInterest/100/12)), totalMonths) - 1) / (rateOfInterest/100/12) * (1+ (rateOfInterest/100/12));
+    return monthlyAmount * (Math.pow((1 + (rateOfInterest / 100 / 12)), totalMonths) - 1) / (rateOfInterest / 100 / 12) * (1 + (rateOfInterest / 100 / 12));
   }
 
   dataChanged() {
-    this.totalInvestment = this.selectedInstallment * this.selectedYear * 12;
-    this.totalValue = Math.round(this.calculateSip(this.selectedInstallment, this.selectedReturnRate, this.selectedYear * 12));
-    this.estimatedReturn = this.totalValue - this.totalInvestment;
+    this.selectedConfiguration.totalInvestment = this.selectedConfiguration.installment * this.selectedConfiguration.year * 12;
+    this.selectedConfiguration.totalValue = Math.round(this.calculateSip(this.selectedConfiguration.installment, this.selectedConfiguration.returnRate, this.selectedConfiguration.year * 12));
+    this.selectedConfiguration.estimatedReturn = this.selectedConfiguration.totalValue - this.selectedConfiguration.totalInvestment;
   }
 
+  save(): void {
+    let newConfiguration = { ...this.dialogConfig.dialogData, configuration: { ...this.selectedConfiguration } };
+    this.dialogConfig.close(newConfiguration as FinancialConfiguration);
+  }
+
+  onInstallmentChange(event: MatSliderChange) {
+    this.selectedConfiguration.installment = event.value;
+  }
+
+  onInterestChange(event: MatSliderChange) {
+    this.selectedConfiguration.returnRate = event.value;
+  }
+
+  onYearChange(event: MatSliderChange) {
+    this.selectedConfiguration.year = event.value;
+  }
 }

@@ -3,10 +3,22 @@ import { Component, ElementRef, Inject, OnInit } from '@angular/core';
 import { DragSourceRenderer } from '../shared/ag-grid-renderers/drag-source.renderer';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { DialogComponent } from './components/dialog/dialog.component';
+import { v4 as uuidv4 } from 'uuid';
+import { resolve } from 'url';
+import { GridOptions } from 'ag-grid-community';
 
-export interface DialogData {
-  animal: string;
+export class MutualFundConfig {
+  year: number;
+  returnRate: number;
+  installment: number;
+  totalInvestment: number;
+  totalValue: number;
+  estimatedReturn: number;
+}
+export class FinancialConfiguration {
   name: string;
+  uuid?: string;
+  configuration?: MutualFundConfig
 }
 
 @Component({
@@ -16,48 +28,56 @@ export interface DialogData {
 })
 export class FlowEngineComponent implements OnInit {
 
-  items = [
-    'Mutual Fund (MF)',
-    'Public Provident Fund (PPF)',
-    'Employee Provident Fund (EPF)',
-    'Fixed Deposits',
-    'National Pension Scheme',
-    'Tax Saver Fixed Deposits',
-    'LIC premium',
-    'National Savings Certificate (NSC)',
-    'Senior citizen savings scheme (SCSS)',
-    'Sukanya smriddhi yojana (SSY)'
-  ];
-
   basket = [
   ];
 
-  columnDefs = [
-    { cellRenderer: 'dragSourceCellRenderer', dndSource: true, width: '300px', field: 'make' },
+  leftColumnDefs = [
+    { cellRenderer: 'dragSourceCellRenderer', dndSource: true, width: '300px', field: 'name' },
   ];
 
-  rowData = [
-    { make: 'Mutual Fund (MF)', },
-    { make: 'Public Provident Fund (PPF)', },
-    { make: 'Employee Provident Fund (EPF)', },
-    { make: 'Fixed Deposits', },
-    { make: 'National Pension Scheme', },
-    { make: 'Tax Saver Fixed Deposits', },
-    { make: 'LIC premium', },
-    { make: 'National Savings Certificate (NSC)', },
-    { make: 'Senior citizen savings scheme (SCSS)', },
-    { make: 'Sukanya smriddhi yojana (SSY)' },
+  financialComponents: FinancialConfiguration[] = [
+    { name: 'Mutual Fund (MF)', configuration: null },
+    { name: 'Public Provident Fund (PPF)', configuration: null },
+    { name: 'Employee Provident Fund (EPF)', configuration: null },
+    { name: 'Fixed Deposits', configuration: null },
+    { name: 'National Pension Scheme', configuration: null },
+    { name: 'Tax Saver Fixed Deposits', configuration: null },
+    { name: 'LIC premium', configuration: null },
+    { name: 'National Savings Certificate (NSC)', configuration: null },
+    { name: 'Senior citizen savings scheme (SCSS)', configuration: null },
+    { name: 'Sukanya smriddhi yojana (SSY)', configuration: null },
   ];
 
-  private gridApi;
-  private gridColumnApi;
+  selectedFinancialComponents: FinancialConfiguration[] = [];
+
+  rightColumnDefs = [
+    { dndSource: true, width: '300px', field: 'name' },
+    { width: '150px', headerName: 'Installment', valueGetter: this.getValue('Installment') },
+    { width: '150px', headerName: 'Investment', valueGetter: this.getValue('Investment') },
+    { width: '150px', headerName: 'Duration', valueGetter: this.getValue('Duration') },
+    { width: '150px', headerName: 'Return Rate', valueGetter: this.getValue('Return Rate') },
+    { width: '150px', headerName: 'Estimated Returns', valueGetter: this.getValue('Estimated Returns') },
+    { width: '150px', headerName: 'Total Returns', valueGetter: this.getValue('Total Returns') },
+    { width: '150px', headerName: 'Liquidity', valueGetter: this.getValue('Liquidity') },
+  ];
+
+  private leftGridApi;
+  private leftGridColumnApi;
+  private rightGridApi;
+  private rightGridColumnApi;
 
   private rowClassRules;
   private defaultColDef;
   private frameworkComponents;
 
-  animal: string;
-  name: string;
+  rightGridOptions: GridOptions = {
+    getRowNodeId: function (data) {
+      return data.uuid
+    },
+    rowDragManaged: true,
+    animateRows: true,
+    rowData: this.selectedFinancialComponents
+  };
 
   constructor(public dialog: MatDialog) {
     this.defaultColDef = {
@@ -72,15 +92,24 @@ export class FlowEngineComponent implements OnInit {
   ngOnInit() {
   }
 
+  getRowNodeId(data) {
+    return data.uuid;
+  }
+
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer !== event.container) {
       copyArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex);
     }
   }
 
-  onGridReady(params) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
+  onLeftGridReady(params) {
+    this.leftGridApi = params.api;
+    this.leftGridColumnApi = params.columnApi;
+  }
+
+  onRightGridReady(params) {
+    this.rightGridApi = params.api;
+    this.rightGridColumnApi = params.columnApi;
   }
 
   onDragOver(event) {
@@ -101,8 +130,12 @@ export class FlowEngineComponent implements OnInit {
       resolvedData = JSON.parse(jsonData);
     }
 
-    if (resolvedData.constructor === ({}).constructor) {
+    let financialConfig = resolvedData as FinancialConfiguration;
+    if (financialConfig) {
+      resolvedData.uuid = uuidv4();
       this.basket.push(resolvedData);
+      this.selectedFinancialComponents.push(resolvedData);
+      this.rightGridApi.setRowData(this.selectedFinancialComponents);
     }
     else {
       console.error('Invalid data supplied to Drag');
@@ -114,17 +147,85 @@ export class FlowEngineComponent implements OnInit {
     this.openDialog(item);
   }
 
-  
-  openDialog(item): void {
+
+  openDialog(item: FinancialConfiguration): void {
     const dialogRef = this.dialog.open(DialogComponent, {
       width: '600px',
-      data: {name: this.name, animal: this.animal},
+      data: item,
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result: FinancialConfiguration) => {
       console.log('The dialog was closed');
-      this.animal = result;
+      let selectedComponent = this.selectedFinancialComponents.find(a => a.uuid === result.uuid);
+      if (selectedComponent) {
+        selectedComponent.configuration = result.configuration;
+        this.rightGridApi.setRowData(this.selectedFinancialComponents);
+      }
     });
+  }
+
+  getValue(propName) {
+    if (propName === 'Installment')
+      return (params) => params.data.configuration && params.data.configuration.installment;
+    if (propName === 'Investment')
+      return (params) => params.data.configuration && params.data.configuration.totalInvestment;
+    if (propName === 'Duration')
+      return (params) => params.data.configuration && params.data.configuration.year;
+    if (propName === 'Return Rate')
+      return (params) => params.data.configuration && params.data.configuration.returnRate;
+    if (propName === 'Estimated Returns')
+      return (params) => params.data.configuration && params.data.configuration.estimatedReturn;
+    if (propName === 'Total Returns')
+      return (params) => params.data.configuration && params.data.configuration.totalValue;
+    if (propName === 'Liquidity')
+      return (params) => params.data.configuration && params.data.configuration.liquidity;
+  }
+
+  gridDrop(event, grid) {
+    event.preventDefault();
+
+    var userAgent = window.navigator.userAgent;
+    var isIE = userAgent.indexOf('Trident/') >= 0;
+    var jsonData = event.dataTransfer.getData(isIE ? 'text' : 'application/json');
+    var data = JSON.parse(jsonData) as FinancialConfiguration;
+
+    // if data missing or data has no it, do nothing
+    if (!data) {
+      return;
+    }
+
+    // do nothing if row is already in the grid, otherwise we would have duplicates
+    var rowAlreadyInGrid = !!this.rightGridApi.getRowNode(data.uuid);
+    if (rowAlreadyInGrid) {
+      console.log('not adding row to avoid duplicates in the grid');
+      return;
+    }
+
+    let financialConfig = data as FinancialConfiguration;
+    if (financialConfig) {
+      data.uuid = uuidv4();
+      this.basket.push(data);
+      this.selectedFinancialComponents.push(data);
+      this.rightGridApi.setRowData(this.selectedFinancialComponents);
+    }
+    else {
+      console.error('Invalid data supplied to Drag');
+    }
+
+    // var transaction = {
+    //   add: [data]
+    // };
+    // gridApi.applyTransaction(transaction);
+  }
+
+
+  gridDragOver(event) {
+    var dragSupported = event.dataTransfer.types.length;
+
+    if (dragSupported) {
+      event.dataTransfer.dropEffect = "copy";
+      event.preventDefault();
+    }
   }
 }
