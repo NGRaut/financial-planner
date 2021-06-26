@@ -7,7 +7,7 @@
                 (gridReady)="onLeftGridReady($event)">
             </ag-grid-angular>
         </div>
-        <div class="col-4">
+        <div *ngIf="laterTrue" class="col-4">
             <!--I initially wanted to use angular material for both drag and drop.
             But while dragging an item from source to destination as a copy, the item disappears temporarily and re-apperars
             thus it looks glitched so I instead went for ag-grid as source to copy from.
@@ -36,12 +36,15 @@
                 </div>
             </div>
         </div>
+        <div class="col-8">
+            <div style="height: 100%;" class="inner-col" (dragover)="gridDragOver($event)"
+                (drop)="gridDrop($event,'left')">
+                <ag-grid-angular #agGrid style="width: 100%; height: 500px;" id="rightGrid" class="ag-theme-alpine"
+                    [defaultColDef]="defaultColDef" [columnDefs]="rightColumnDefs"
+                    [frameworkComponents]="frameworkComponents" (gridReady)="onRightGridReady($event)"
+                    [gridOptions]="rightGridOptions">
+                </ag-grid-angular>
+            </div>
+        </div>
     </div>
-</div>
-
-<div style="height: 100%;" class="inner-col" (dragover)="gridDragOver($event)" (drop)="gridDrop($event,'left')">
-    <ag-grid-angular #agGrid style="width: 100%; height: 500px;" id="rightGrid" class="ag-theme-alpine"
-        [defaultColDef]="defaultColDef" [columnDefs]="rightColumnDefs" [frameworkComponents]="frameworkComponents"
-        (gridReady)="onRightGridReady($event)" [gridOptions]="rightGridOptions">
-    </ag-grid-angular>
 </div>

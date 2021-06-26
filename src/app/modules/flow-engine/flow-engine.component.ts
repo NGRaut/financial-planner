@@ -52,6 +52,7 @@ export class FlowEngineComponent implements OnInit {
 
   rightColumnDefs = [
     { dndSource: true, width: '300px', field: 'name' },
+    { width: '150px', headerName: '', valueGetter: () => 'Configure' },
     { width: '150px', headerName: 'Installment', valueGetter: this.getValue('Installment') },
     { width: '150px', headerName: 'Investment', valueGetter: this.getValue('Investment') },
     { width: '150px', headerName: 'Duration', valueGetter: this.getValue('Duration') },
@@ -76,7 +77,8 @@ export class FlowEngineComponent implements OnInit {
     },
     rowDragManaged: true,
     animateRows: true,
-    rowData: this.selectedFinancialComponents
+    rowData: this.selectedFinancialComponents,
+    onCellClicked: this.cellClicked.bind(this)
   };
 
   constructor(public dialog: MatDialog) {
@@ -227,5 +229,10 @@ export class FlowEngineComponent implements OnInit {
       event.dataTransfer.dropEffect = "copy";
       event.preventDefault();
     }
+  }
+
+  cellClicked(params) {
+    if (params.value === 'Configure')
+      this.openConfiguration(params.data);
   }
 }
