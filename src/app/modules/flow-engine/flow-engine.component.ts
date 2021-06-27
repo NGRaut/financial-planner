@@ -8,17 +8,17 @@ import { resolve } from 'url';
 import { GridOptions } from 'ag-grid-community';
 
 export class MutualFundConfig {
-  year: number;
-  returnRate: number;
-  installment: number;
-  totalInvestment: number;
-  totalValue: number;
-  estimatedReturn: number;
+  year?: number;
+  returnRate?: number;
+  installment?: number;
+  totalInvestment?: number;
+  totalValue?: number;
+  estimatedReturn?: number;
 }
 export class FinancialConfiguration {
   name: string;
   uuid?: string;
-  configuration?: MutualFundConfig
+  configuration?: MutualFundConfig;
 }
 
 @Component({
@@ -51,44 +51,78 @@ export class FlowEngineComponent implements OnInit {
   selectedFinancialComponents: FinancialConfiguration[] = [];
 
   rightColumnDefs = [
-    { dndSource: true, width: '300px', field: 'name' },
-    { width: '150px', headerName: '', valueGetter: () => 'Configure' },
+    { dndSource: true, width: '200px', field: 'name' },
+    { width: '150px', headerName: '', valueGetter: () => 'Configure', cellClass: ['cursor-pointer'] },
     { width: '150px', headerName: 'Installment', valueGetter: this.getValue('Installment') },
-    { width: '150px', headerName: 'Investment', valueGetter: this.getValue('Investment') },
     { width: '150px', headerName: 'Duration', valueGetter: this.getValue('Duration') },
+    { width: '150px', headerName: 'Investment', valueGetter: this.getValue('Investment') },
     { width: '150px', headerName: 'Return Rate', valueGetter: this.getValue('Return Rate') },
     { width: '150px', headerName: 'Estimated Returns', valueGetter: this.getValue('Estimated Returns') },
     { width: '150px', headerName: 'Total Returns', valueGetter: this.getValue('Total Returns') },
     { width: '150px', headerName: 'Liquidity', valueGetter: this.getValue('Liquidity') },
   ];
 
+  bottomColumnDefs = [
+    { dndSource: true, width: '200px', valueGetter: () => 'Total' },
+    { width: '150px', headerName: '' },
+    { width: '150px', headerName: 'Installments', field: 'installment' },
+    { width: '150px', },
+    { width: '150px', headerName: 'Investment', field: 'totalInvestment'  },
+    { width: '150px', },
+    { width: '150px', headerName: 'Estimated Returns', field: 'estimatedReturn'  },
+    { width: '150px', headerName: 'Total Returns', field: 'totalValue'  },
+    { width: '150px', headerName: 'Liquidity', field: 'liquidity'  },
+  ];
+
+  bottomData = []
+
   private leftGridApi;
   private leftGridColumnApi;
   private rightGridApi;
   private rightGridColumnApi;
+  private bottomRightGridApi;
+  private bottomRightGridColumnApi;
 
   private rowClassRules;
   private defaultColDef;
-  private frameworkComponents;
+  private frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer };
 
-  rightGridOptions: GridOptions = {
+  topRightGridOptions: GridOptions = {
+    alignedGrids: [],
     getRowNodeId: function (data) {
       return data.uuid
     },
     rowDragManaged: true,
     animateRows: true,
     rowData: this.selectedFinancialComponents,
-    onCellClicked: this.cellClicked.bind(this)
-  };
-
-  constructor(public dialog: MatDialog) {
-    this.defaultColDef = {
+    onCellClicked: this.cellClicked.bind(this),
+    defaultColDef: {
       width: 80,
       sortable: true,
       filter: true,
       resizable: true,
-    };
-    this.frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer };
+    },
+    frameworkComponents: this.frameworkComponents,
+    onGridReady: this.onRightGridReady.bind(this)
+  };
+
+  bottomRightGridOptions: GridOptions = {
+    alignedGrids: [],
+    rowDragManaged: true,
+    animateRows: true,
+    rowData: this.bottomData,
+    defaultColDef: {
+      width: 80,
+      sortable: true,
+      filter: true,
+      resizable: true,
+    },
+    onGridReady: this.onBottomRightGridReady.bind(this)
+  };
+
+  constructor(public dialog: MatDialog) {
+    this.topRightGridOptions.alignedGrids.push(this.bottomRightGridOptions);
+    this.bottomRightGridOptions.alignedGrids.push(this.topRightGridOptions);
   }
 
   ngOnInit() {
@@ -114,6 +148,11 @@ export class FlowEngineComponent implements OnInit {
     this.rightGridColumnApi = params.columnApi;
   }
 
+  onBottomRightGridReady(params) {
+    this.bottomRightGridApi = params.api;
+    this.bottomRightGridColumnApi = params.columnApi;
+  }
+
   onDragOver(event) {
     var dragSupported = event.dataTransfer.length;
     if (dragSupported) {
@@ -122,6 +161,7 @@ export class FlowEngineComponent implements OnInit {
     event.preventDefault();
   }
 
+  //Use this with Angular CDK's drop zone
   onDrop(event) {
     var userAgent = window.navigator.userAgent;
     var isIE = userAgent.indexOf('Trident/') >= 0;
@@ -145,7 +185,6 @@ export class FlowEngineComponent implements OnInit {
   }
 
   openConfiguration(item) {
-    console.log('called', item);
     this.openDialog(item);
   }
 
@@ -158,30 +197,51 @@ export class FlowEngineComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result: FinancialConfiguration) => {
-      console.log('The dialog was closed');
       let selectedComponent = this.selectedFinancialComponents.find(a => a.uuid === result.uuid);
       if (selectedComponent) {
         selectedComponent.configuration = result.configuration;
         this.rightGridApi.setRowData(this.selectedFinancialComponents);
+        this.updateSummaryGrid();
       }
     });
   }
 
   getValue(propName) {
     if (propName === 'Installment')
-      return (params) => params.data.configuration && params.data.configuration.installment;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.installment
+      };
     if (propName === 'Investment')
-      return (params) => params.data.configuration && params.data.configuration.totalInvestment;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.totalInvestment
+      };
     if (propName === 'Duration')
-      return (params) => params.data.configuration && params.data.configuration.year;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.year
+      };
     if (propName === 'Return Rate')
-      return (params) => params.data.configuration && params.data.configuration.returnRate;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.returnRate
+      };
     if (propName === 'Estimated Returns')
-      return (params) => params.data.configuration && params.data.configuration.estimatedReturn;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.estimatedReturn
+      };
     if (propName === 'Total Returns')
-      return (params) => params.data.configuration && params.data.configuration.totalValue;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.totalValue
+      };
     if (propName === 'Liquidity')
-      return (params) => params.data.configuration && params.data.configuration.liquidity;
+      return (params) => {
+        if (!params.node.footer)
+          return params.data.configuration && params.data.configuration.liquidity
+      };
   }
 
   gridDrop(event, grid) {
@@ -200,7 +260,7 @@ export class FlowEngineComponent implements OnInit {
     // do nothing if row is already in the grid, otherwise we would have duplicates
     var rowAlreadyInGrid = !!this.rightGridApi.getRowNode(data.uuid);
     if (rowAlreadyInGrid) {
-      console.log('not adding row to avoid duplicates in the grid');
+      console.error('not adding row to avoid duplicates in the grid');
       return;
     }
 
@@ -210,17 +270,12 @@ export class FlowEngineComponent implements OnInit {
       this.basket.push(data);
       this.selectedFinancialComponents.push(data);
       this.rightGridApi.setRowData(this.selectedFinancialComponents);
+      this.updateSummaryGrid();
     }
     else {
       console.error('Invalid data supplied to Drag');
     }
-
-    // var transaction = {
-    //   add: [data]
-    // };
-    // gridApi.applyTransaction(transaction);
   }
-
 
   gridDragOver(event) {
     var dragSupported = event.dataTransfer.types.length;
@@ -234,5 +289,25 @@ export class FlowEngineComponent implements OnInit {
   cellClicked(params) {
     if (params.value === 'Configure')
       this.openConfiguration(params.data);
+  }
+
+  updateSummaryGrid() {
+    let aggregate = this.selectedFinancialComponents.map(a => {
+      let result: MutualFundConfig;
+      result = {
+        estimatedReturn: (a.configuration && a.configuration.estimatedReturn) || 0,
+        installment: (a.configuration && a.configuration.installment) || 0,
+        totalInvestment: (a.configuration && a.configuration.totalInvestment) || 0,
+        totalValue: (a.configuration && a.configuration.totalValue) || 0
+      }
+      return result;
+    }).reduce((final, current) => {
+      final.estimatedReturn = final.estimatedReturn + current.estimatedReturn;
+      final.installment = final.installment + current.installment;
+      final.totalInvestment = final.totalInvestment + current.totalInvestment;
+      final.totalValue = final.totalValue + current.totalValue;
+      return final;
+    }, { estimatedReturn: 0, installment: 0, totalInvestment: 0, totalValue: 0 });
+    this.bottomRightGridApi.setRowData([aggregate]);
   }
 }

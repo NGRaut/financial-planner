@@ -122,13 +122,16 @@ export class MutualFundComponent implements OnInit {
 
   onInstallmentChange(event: MatSliderChange) {
     this.selectedConfiguration.installment = event.value;
+    this.dataChanged();
   }
 
   onInterestChange(event: MatSliderChange) {
     this.selectedConfiguration.returnRate = event.value;
+    this.dataChanged();
   }
 
   onYearChange(event: MatSliderChange) {
     this.selectedConfiguration.year = event.value;
+    this.dataChanged();
   }
 }

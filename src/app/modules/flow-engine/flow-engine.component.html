@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-4">
-            <ag-grid-angular #agGrid style="width: 100%; height: 500px;" id="leftGrid" class="ag-theme-alpine"
+            <ag-grid-angular #leftAgGrid style="width: 100%; height: 450px;" id="leftGrid" class="ag-theme-alpine"
                 [defaultColDef]="defaultColDef" [rowData]="financialComponents" [rowDragManaged]="true"
                 [columnDefs]="leftColumnDefs" [frameworkComponents]="frameworkComponents" [animateRows]="true"
                 (gridReady)="onLeftGridReady($event)">
@@ -39,10 +39,11 @@
         <div class="col-8">
             <div style="height: 100%;" class="inner-col" (dragover)="gridDragOver($event)"
                 (drop)="gridDrop($event,'left')">
-                <ag-grid-angular #agGrid style="width: 100%; height: 500px;" id="rightGrid" class="ag-theme-alpine"
-                    [defaultColDef]="defaultColDef" [columnDefs]="rightColumnDefs"
-                    [frameworkComponents]="frameworkComponents" (gridReady)="onRightGridReady($event)"
-                    [gridOptions]="rightGridOptions">
+                <ag-grid-angular #topRightAgGrid style="width: 100%; height: 450px;" id="topRightGrid" class="ag-theme-alpine"
+                    [columnDefs]="rightColumnDefs" [gridOptions]="topRightGridOptions">
+                </ag-grid-angular>
+                <ag-grid-angular #bottomRightAgGrid style="width: 100%; height: 110px;" id="bottomRightGrid" class="ag-theme-alpine"
+                    [columnDefs]="bottomColumnDefs" [gridOptions]="bottomRightGridOptions">
                 </ag-grid-angular>
             </div>
         </div>
