@@ -42,6 +42,7 @@ export class DialogComponent implements OnInit {
   }
 
   onClose(popupData): void {
+    popupData.saved = true;
     this.dialogRef.close(popupData);
   }
 

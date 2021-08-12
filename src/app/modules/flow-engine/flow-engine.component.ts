@@ -21,6 +21,13 @@ export class FinancialConfiguration {
   configuration?: MutualFundConfig;
 }
 
+export class FinancialConfigurationTracker {
+  name: string;
+  uuid?: string;
+  configuration?: MutualFundConfig;
+  saved?: boolean
+}
+
 @Component({
   selector: 'app-flow-engine',
   templateUrl: './flow-engine.component.html',
@@ -65,10 +72,10 @@ export class FlowEngineComponent implements OnInit {
   bottomColumnDefs = [
     { dndSource: true, width: '200px', valueGetter: () => 'Total' },
     { width: '150px', headerName: 'Installments', field: 'installment' },
-    { width: '150px', headerName: 'Investment', field: 'totalInvestment'  },
-    { width: '170px', headerName: 'Estimated Returns', field: 'estimatedReturn'  },
-    { width: '150px', headerName: 'Total Returns', field: 'totalValue'  },
-    { width: '150px', headerName: 'Liquidity', field: 'liquidity'  },
+    { width: '150px', headerName: 'Investment', field: 'totalInvestment' },
+    { width: '170px', headerName: 'Estimated Returns', field: 'estimatedReturn' },
+    { width: '150px', headerName: 'Total Returns', field: 'totalValue' },
+    { width: '150px', headerName: 'Liquidity', field: 'liquidity' },
   ];
 
   bottomData = []
@@ -83,6 +90,15 @@ export class FlowEngineComponent implements OnInit {
   private rowClassRules;
   private defaultColDef;
   private frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer };
+
+  noRowsTemplate: string = `<div style="display:flex">
+    <img src="assets/icons/drag-64.png" alt="Drag and drop">
+    <ol id="steps" style="text-align: left; font-size:14px">
+      <li>Drag any Financial component from sidebar to here</li>
+      <li>Click Configure and enter your desired investment details and click Save</li>
+      <li>Then you can see summarized return details.</li>
+    </ol>
+  </div>`;
 
   topRightGridOptions: GridOptions = {
     alignedGrids: [],
@@ -100,7 +116,9 @@ export class FlowEngineComponent implements OnInit {
       resizable: true,
     },
     frameworkComponents: this.frameworkComponents,
-    onGridReady: this.onRightGridReady.bind(this)
+    onGridReady: this.onRightGridReady.bind(this),
+    overlayNoRowsTemplate: this.noRowsTemplate,
+    onRowDataChanged: this.rowDataChanged.bind(this)
   };
 
   bottomRightGridOptions: GridOptions = {
@@ -116,6 +134,8 @@ export class FlowEngineComponent implements OnInit {
     },
     onGridReady: this.onBottomRightGridReady.bind(this)
   };
+
+  hasOneItemSaved: boolean = false;
 
   constructor(public dialog: MatDialog) {
     this.topRightGridOptions.alignedGrids.push(this.bottomRightGridOptions);
@@ -193,7 +213,8 @@ export class FlowEngineComponent implements OnInit {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe((result: FinancialConfiguration) => {
+    dialogRef.afterClosed().subscribe((result: FinancialConfigurationTracker) => {
+      this.hasOneItemSaved = result.saved;
       let selectedComponent = this.selectedFinancialComponents.find(a => a.uuid === result.uuid);
       if (selectedComponent) {
         selectedComponent.configuration = result.configuration;
@@ -289,18 +310,7 @@ export class FlowEngineComponent implements OnInit {
   }
 
   updateSummaryGrid() {
-    let aggregate = this.selectedFinancialComponents
-    // .map(current => {
-    //   let result: MutualFundConfig;
-    //   result = {
-    //     estimatedReturn: (current.configuration && current.configuration.estimatedReturn) || 0,
-    //     installment: (current.configuration && current.configuration.installment) || 0,
-    //     totalInvestment: (current.configuration && current.configuration.totalInvestment) || 0,
-    //     totalValue: (current.configuration && current.configuration.totalValue) || 0
-    //   }
-    //   return result;
-    // })
-    .reduce((final, current) => {
+    let aggregate = this.selectedFinancialComponents.reduce((final, current) => {
       final.estimatedReturn = final.estimatedReturn + (current.configuration && current.configuration.estimatedReturn) || 0;
       final.installment = final.installment + (current.configuration && current.configuration.installment) || 0;
       final.totalInvestment = final.totalInvestment + (current.configuration && current.configuration.totalInvestment) || 0;
@@ -308,5 +318,14 @@ export class FlowEngineComponent implements OnInit {
       return final;
     }, { estimatedReturn: 0, installment: 0, totalInvestment: 0, totalValue: 0 });
     this.bottomRightGridApi.setRowData([aggregate]);
+  }
+
+  rowDataChanged() {
+    if (this.rightGridApi != null && this.rightGridApi != undefined && this.selectedFinancialComponents != null && this.selectedFinancialComponents != undefined) {
+      if (this.selectedFinancialComponents.length === 1 && !this.hasOneItemSaved)
+        this.rightGridApi.showNoRowsOverlay();
+      else
+        this.rightGridApi.hideOverlay();
+    }
   }
 }

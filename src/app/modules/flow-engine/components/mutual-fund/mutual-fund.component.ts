@@ -140,9 +140,4 @@ export class MutualFundComponent implements OnInit {
     this.selectedConfiguration.year = value;
     this.dataChanged();
   }
-
-  // onNoClick(): void {
-  //   // let newConfiguration = { ...this.dialogConfig.dialogData, configuration: this.selectedConfiguration };
-  //   this.dialogConfig.close(this.dialogConfig.dialogData as FinancialConfiguration);
-  // }
 }
