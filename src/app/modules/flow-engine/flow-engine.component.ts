@@ -6,6 +6,7 @@ import { DialogComponent } from './components/dialog/dialog.component';
 import { v4 as uuidv4 } from 'uuid';
 import { resolve } from 'url';
 import { GridOptions } from 'ag-grid-community';
+import { DeleteRowRenderer } from '../shared/ag-grid-renderers/delete-row.renderer';
 
 export class MutualFundConfig {
   year?: number;
@@ -58,6 +59,11 @@ export class FlowEngineComponent implements OnInit {
   selectedFinancialComponents: FinancialConfiguration[] = [];
 
   rightColumnDefs = [
+    {
+      field: '', cellRenderer: 'deleteRowRenderer', cellRendererParams: {
+        clicked: this.deleteRow.bind(this)
+      }, minWidth: 100, headerName: 'Action'
+    },
     { dndSource: true, width: '200px', field: 'name' },
     { width: '150px', headerName: '', valueGetter: () => 'Configure', cellClass: ['cursor-pointer'] },
     { width: '150px', headerName: 'Installment', valueGetter: this.getValue('Installment') },
@@ -87,9 +93,7 @@ export class FlowEngineComponent implements OnInit {
   private bottomRightGridApi;
   private bottomRightGridColumnApi;
 
-  private rowClassRules;
-  private defaultColDef;
-  private frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer };
+  private frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer, deleteRowRenderer: DeleteRowRenderer };
 
   noRowsTemplate: string = `<div style="display:flex">
     <img src="assets/icons/drag-64.png" alt="Drag and drop">
@@ -322,10 +326,19 @@ export class FlowEngineComponent implements OnInit {
 
   rowDataChanged() {
     if (this.rightGridApi != null && this.rightGridApi != undefined && this.selectedFinancialComponents != null && this.selectedFinancialComponents != undefined) {
-      if (this.selectedFinancialComponents.length === 1 && !this.hasOneItemSaved)
-        this.rightGridApi.showNoRowsOverlay();
-      else
+      if (this.hasOneItemSaved)
         this.rightGridApi.hideOverlay();
+      else
+        this.rightGridApi.showNoRowsOverlay();
+    }
+  }
+
+  deleteRow(selectedUUID: any) {
+    let removableIndex = this.selectedFinancialComponents.indexOf(a => a.uuid === selectedUUID);
+    if (removableIndex) {
+      this.selectedFinancialComponents.splice(removableIndex, 1);
+      this.rightGridApi.setRowData(this.selectedFinancialComponents);
+      this.updateSummaryGrid();
     }
   }
 }
