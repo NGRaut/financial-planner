@@ -15,12 +15,12 @@
             </mat-select>
           </div>
           <div class="col">
-            <input matInput [(ngModel)]="selectedConfiguration.installment" (keypress)="keyPress($event)">
+            <input matInput [(ngModel)]="selectedConfiguration.installment" (ngModelChange)="onInstallmentChange($event)" type="number">
           </div>
         </div>
         <mat-slider class="full-width" [max]="frequency.max" [min]="frequency.min" thumbLabel
           [displayWith]="formatLabel" [step]="frequency.step" [(ngModel)]="selectedConfiguration.installment"
-          aria-labelledby="example-name-label" (input)="onInstallmentChange($event)">
+          aria-labelledby="example-name-label" (ngModelChange)="onInstallmentChange($event)">
         </mat-slider>
       </div>
     </div>
@@ -31,12 +31,12 @@
             <mat-label>Expected Rate of Interest</mat-label>
           </div>
           <div class="col">
-            <input matInput type="number" [(ngModel)]="selectedConfiguration.returnRate" (keypress)="keyPress($event)">
+            <input matInput type="number" [(ngModel)]="selectedConfiguration.returnRate" (ngModelChange)="onInterestChange($event)" type="number">
           </div>
         </div>
         <mat-slider class="full-width" [max]="expectedReturnRate.max" [min]="expectedReturnRate.min" thumbLabel
           [displayWith]="formatLabel" [step]="expectedReturnRate.step" [(ngModel)]="selectedConfiguration.returnRate"
-          aria-labelledby="example-name-label" (input)="onInterestChange($event)">
+          aria-labelledby="example-name-label" (ngModelChange)="onInterestChange($event)">
         </mat-slider>
       </div>
     </div>
@@ -47,12 +47,12 @@
             <mat-label>Time Period</mat-label>
           </div>
           <div class="col">
-            <input matInput type="number" [(ngModel)]="selectedConfiguration.year" (keypress)="keyPress($event)">
+            <input matInput type="number" [(ngModel)]="selectedConfiguration.year" (ngModelChange)="onYearChange($event)" type="number">
           </div>
         </div>
         <mat-slider class="full-width" [max]="timePeriod.max" [min]="timePeriod.min" thumbLabel
           [displayWith]="formatLabel" [step]="timePeriod.step" [(ngModel)]="selectedConfiguration.year"
-          aria-labelledby="example-name-label" (input)="onYearChange($event)">
+          aria-labelledby="example-name-label" (ngModelChange)="onYearChange($event)">
         </mat-slider>
       </div>
     </div>
@@ -84,7 +84,7 @@
   </mat-card-actions> -->
 </mat-card>
 
-<div mat-dialog-actions>
+<!-- <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Cancel</button>
   <button mat-button (click)="save()" mat-dialog-close cdkFocusInitial color="primary" mat-raised-button>Ok</button>
-</div>
+</div> -->

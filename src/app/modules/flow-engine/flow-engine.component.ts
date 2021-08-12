@@ -10,7 +10,7 @@ import { GridOptions } from 'ag-grid-community';
 export class MutualFundConfig {
   year?: number;
   returnRate?: number;
-  installment?: number;
+  installment?: number = 0;
   totalInvestment?: number;
   totalValue?: number;
   estimatedReturn?: number;
@@ -54,22 +54,19 @@ export class FlowEngineComponent implements OnInit {
     { dndSource: true, width: '200px', field: 'name' },
     { width: '150px', headerName: '', valueGetter: () => 'Configure', cellClass: ['cursor-pointer'] },
     { width: '150px', headerName: 'Installment', valueGetter: this.getValue('Installment') },
-    { width: '150px', headerName: 'Duration', valueGetter: this.getValue('Duration') },
+    { width: '160px', headerName: 'Duration (years)', valueGetter: this.getValue('Duration') },
     { width: '150px', headerName: 'Investment', valueGetter: this.getValue('Investment') },
-    { width: '150px', headerName: 'Return Rate', valueGetter: this.getValue('Return Rate') },
-    { width: '150px', headerName: 'Estimated Returns', valueGetter: this.getValue('Estimated Returns') },
+    { width: '150px', headerName: 'Return Rate (%)', valueGetter: this.getValue('Return Rate') },
+    { width: '170px', headerName: 'Estimated Returns', valueGetter: this.getValue('Estimated Returns') },
     { width: '150px', headerName: 'Total Returns', valueGetter: this.getValue('Total Returns') },
     { width: '150px', headerName: 'Liquidity', valueGetter: this.getValue('Liquidity') },
   ];
 
   bottomColumnDefs = [
     { dndSource: true, width: '200px', valueGetter: () => 'Total' },
-    { width: '150px', headerName: '' },
     { width: '150px', headerName: 'Installments', field: 'installment' },
-    { width: '150px', },
     { width: '150px', headerName: 'Investment', field: 'totalInvestment'  },
-    { width: '150px', },
-    { width: '150px', headerName: 'Estimated Returns', field: 'estimatedReturn'  },
+    { width: '170px', headerName: 'Estimated Returns', field: 'estimatedReturn'  },
     { width: '150px', headerName: 'Total Returns', field: 'totalValue'  },
     { width: '150px', headerName: 'Liquidity', field: 'liquidity'  },
   ];
@@ -292,20 +289,22 @@ export class FlowEngineComponent implements OnInit {
   }
 
   updateSummaryGrid() {
-    let aggregate = this.selectedFinancialComponents.map(a => {
-      let result: MutualFundConfig;
-      result = {
-        estimatedReturn: (a.configuration && a.configuration.estimatedReturn) || 0,
-        installment: (a.configuration && a.configuration.installment) || 0,
-        totalInvestment: (a.configuration && a.configuration.totalInvestment) || 0,
-        totalValue: (a.configuration && a.configuration.totalValue) || 0
-      }
-      return result;
-    }).reduce((final, current) => {
-      final.estimatedReturn = final.estimatedReturn + current.estimatedReturn;
-      final.installment = final.installment + current.installment;
-      final.totalInvestment = final.totalInvestment + current.totalInvestment;
-      final.totalValue = final.totalValue + current.totalValue;
+    let aggregate = this.selectedFinancialComponents
+    // .map(current => {
+    //   let result: MutualFundConfig;
+    //   result = {
+    //     estimatedReturn: (current.configuration && current.configuration.estimatedReturn) || 0,
+    //     installment: (current.configuration && current.configuration.installment) || 0,
+    //     totalInvestment: (current.configuration && current.configuration.totalInvestment) || 0,
+    //     totalValue: (current.configuration && current.configuration.totalValue) || 0
+    //   }
+    //   return result;
+    // })
+    .reduce((final, current) => {
+      final.estimatedReturn = final.estimatedReturn + (current.configuration && current.configuration.estimatedReturn) || 0;
+      final.installment = final.installment + (current.configuration && current.configuration.installment) || 0;
+      final.totalInvestment = final.totalInvestment + (current.configuration && current.configuration.totalInvestment) || 0;
+      final.totalValue = final.totalValue + (current.configuration && current.configuration.totalValue) || 0;
       return final;
     }, { estimatedReturn: 0, installment: 0, totalInvestment: 0, totalValue: 0 });
     this.bottomRightGridApi.setRowData([aggregate]);

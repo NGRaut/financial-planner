@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatSliderChange } from '@angular/material';
+import { Subject } from 'rxjs';
 import { FinancialConfiguration } from '../../flow-engine.component';
 import { DialogConfig } from '../dialog/dialog.component';
 
@@ -79,6 +80,10 @@ export class MutualFundComponent implements OnInit {
     if (this.dialogConfig.dialogData.configuration)
       this.selectedConfiguration = JSON.parse(JSON.stringify(this.dialogConfig.dialogData.configuration));
     this.dataChanged();
+    this.dialogConfig.dataSubject$.subscribe(() => {
+      this.dialogConfig.dataSubject$.unsubscribe();
+      this.save();
+    });
   }
 
   formatLabel(value: number) {
@@ -103,6 +108,7 @@ export class MutualFundComponent implements OnInit {
     if (event.which < 48 || event.which > 57) {
       event.preventDefault();
     }
+    this.dataChanged();
   }
 
   calculateSip(monthlyAmount, rateOfInterest, totalMonths) {
@@ -116,22 +122,27 @@ export class MutualFundComponent implements OnInit {
   }
 
   save(): void {
-    let newConfiguration = { ...this.dialogConfig.dialogData, configuration: { ...this.selectedConfiguration } };
-    this.dialogConfig.close(newConfiguration as FinancialConfiguration);
+    let newConfiguration: FinancialConfiguration = { ...this.dialogConfig.dialogData, configuration: { ...this.selectedConfiguration } };
+    this.dialogConfig.close(newConfiguration);
   }
 
-  onInstallmentChange(event: MatSliderChange) {
-    this.selectedConfiguration.installment = event.value;
+  onInstallmentChange(value) {
+    this.selectedConfiguration.installment = value;
     this.dataChanged();
   }
 
-  onInterestChange(event: MatSliderChange) {
-    this.selectedConfiguration.returnRate = event.value;
+  onInterestChange(value) {
+    this.selectedConfiguration.returnRate = value;
     this.dataChanged();
   }
 
-  onYearChange(event: MatSliderChange) {
-    this.selectedConfiguration.year = event.value;
+  onYearChange(value) {
+    this.selectedConfiguration.year = value;
     this.dataChanged();
   }
+
+  // onNoClick(): void {
+  //   // let newConfiguration = { ...this.dialogConfig.dialogData, configuration: this.selectedConfiguration };
+  //   this.dialogConfig.close(this.dialogConfig.dialogData as FinancialConfiguration);
+  // }
 }

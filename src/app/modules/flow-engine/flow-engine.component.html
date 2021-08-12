@@ -1,6 +1,6 @@
 <div class="container-fluid">
     <div class="row">
-        <div class="col-4">
+        <div class="col-3">
             <ag-grid-angular #leftAgGrid style="width: 100%; height: 450px;" id="leftGrid" class="ag-theme-alpine"
                 [defaultColDef]="defaultColDef" [rowData]="financialComponents" [rowDragManaged]="true"
                 [columnDefs]="leftColumnDefs" [frameworkComponents]="frameworkComponents" [animateRows]="true"
@@ -36,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-8">
+        <div class="col-9">
             <div style="height: 100%;" class="inner-col" (dragover)="gridDragOver($event)"
                 (drop)="gridDrop($event,'left')">
                 <ag-grid-angular #topRightAgGrid style="width: 100%; height: 450px;" id="topRightGrid" class="ag-theme-alpine"
