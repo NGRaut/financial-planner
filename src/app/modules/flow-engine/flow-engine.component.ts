@@ -93,7 +93,7 @@ export class FlowEngineComponent implements OnInit {
   private bottomRightGridApi;
   private bottomRightGridColumnApi;
 
-  private frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer, deleteRowRenderer: DeleteRowRenderer };
+  public frameworkComponents = { dragSourceCellRenderer: DragSourceRenderer, deleteRowRenderer: DeleteRowRenderer };
 
   noRowsTemplate: string = `<div style="display:flex">
     <img src="assets/icons/drag-64.png" alt="Drag and drop">

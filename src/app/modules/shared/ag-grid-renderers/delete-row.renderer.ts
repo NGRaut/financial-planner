@@ -22,7 +22,7 @@ export class DeleteRowRenderer implements ICellRendererAngularComp, OnDestroy {
     return true;
   }
 
-  btnClickedHandler() {
+  btnClickedHandler(event) {
     this.params.clicked(this.cellValue);
   }
 
