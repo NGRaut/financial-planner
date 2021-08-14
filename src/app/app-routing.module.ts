@@ -3,10 +3,10 @@ import { Routes, RouterModule } from '@angular/router';
 
 
 const routes: Routes = [
-  {
-    path: 'flow-engine',
-    loadChildren: () => import('./modules/flow-engine/flow-engine.module').then(m => m.FlowEngineModule)
-  },
+  // {
+  //   path: 'flow-engine',
+  //   loadChildren: () => import('./modules/flow-engine/flow-engine.module').then(m => m.FlowEngineModule)
+  // },
   {
     path: '',
     loadChildren: () => import('./modules/home/home.module').then(m => m.HomeModule)

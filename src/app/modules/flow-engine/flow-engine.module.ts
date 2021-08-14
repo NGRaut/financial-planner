@@ -23,7 +23,7 @@ import { MatSliderModule } from '@angular/material';
   imports: [
     CommonModule,
     FormsModule,
-    FlowEngineRoutingModule,
+    // FlowEngineRoutingModule,
     DragDropModule,
     AgGridModule.withComponents([DragSourceRenderer]),
     MatDialogModule,
@@ -37,6 +37,7 @@ import { MatSliderModule } from '@angular/material';
     ReactiveFormsModule,
     MatSliderModule
   ],
-  entryComponents: [DialogComponent]
+  entryComponents: [DialogComponent],
+  exports: [FlowEngineComponent]
 })
 export class FlowEngineModule { }
